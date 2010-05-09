@@ -3,14 +3,16 @@
 """
 convert.py
 
-Created by Miles Skorpen on 2009-07-01.
+Created by Miles Skorpen on 2009-07-01
 Contributed to by Albert Sun, Will Davis, Daniel Bachhuber, Max Cutler
 Version 0.9
-Copyright (c) 2010 CoPress. All rights reserved.
+Copyright (c) 2010 CoPress
+Released under GNU General Public License, version 2 (that's what WordPress uses!)
 
 @todo Prepare README file on usage of script
-@todo Choose an open source license to release the script under
+@todo Add mad commentsto to the script
 @todo Abstract settings/options to be read from top of file instead of prompting every time
+@todo Fix processing and import of categories
 @todo Ensure CP5 images are being handled properly
 
 """
@@ -21,7 +23,7 @@ import time
 import os
 from pprint import pprint
 
-# define our method
+# Helps to replace characters
 def replace_all(text, dic):
     for i, j in dic.iteritems():
         text = text.replace(i, j)
