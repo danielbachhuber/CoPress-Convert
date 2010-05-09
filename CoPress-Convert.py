@@ -6,6 +6,11 @@ convert.py
 Created by Miles Skorpen on 2009-07-01.
 Contributed to by Albert Sun, Will Davis, Daniel Bachhuber, Max Cutler
 Copyright (c) 2010 CoPress. All rights reserved.
+
+@todo Prepare README file on usage of script
+@todo Ensure CP5 images are being handled properly
+@todo Enabled adding multiple images as custom fields
+
 """
 import csv
 import time
