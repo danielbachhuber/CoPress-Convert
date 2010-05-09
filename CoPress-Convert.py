@@ -12,7 +12,6 @@ Copyright (c) 2010 CoPress. All rights reserved.
 @todo Choose an open source license to release the script under
 @todo Abstract settings/options to be read from top of file instead of prompting every time
 @todo Ensure CP5 images are being handled properly
-@todo Enabled adding multiple images as custom fields
 
 """
 import csv
@@ -182,7 +181,7 @@ class Post:
             item = item + addendum
             
         if self.image_custom:
-            for key, image in self.image_field:
+            for image in self.image_field:
                 addendum = """
                         <wp:postmeta>
                             <wp:meta_key>image</wp:meta_key>
@@ -480,6 +479,7 @@ def addImages(PostList,images,verbose,image_custom):
         print " ############################################################ "
         print " ############################################################ "
 
+    # Read CP4 images from media.csv
     if len(images) == 0:
         mediaCSV = csv.reader(open('media.csv'), delimiter=',', quotechar='"')
         media = []
@@ -816,7 +816,7 @@ def main():
 <title>CoPress Import</title>
 <link>%s</link>
 <pubDate>%s</pubDate>
-<generator>CoPress Converter (v .5)</generator>
+<generator>CoPress Convert (v 0.9)</generator>
 <language>en</language>
 <wp:wxr_version>1.0</wp:wxr_version>
 <wp:base_site_url>%s</wp:base_site_url>
