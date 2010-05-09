@@ -5,9 +5,12 @@ convert.py
 
 Created by Miles Skorpen on 2009-07-01.
 Contributed to by Albert Sun, Will Davis, Daniel Bachhuber, Max Cutler
+Version 0.9
 Copyright (c) 2010 CoPress. All rights reserved.
 
 @todo Prepare README file on usage of script
+@todo Choose an open source license to release the script under
+@todo Abstract settings/options to be read from top of file instead of prompting every time
 @todo Ensure CP5 images are being handled properly
 @todo Enabled adding multiple images as custom fields
 
@@ -65,15 +68,19 @@ class Post:
         self.wp_post_password = ""
 
         self.image_custom = False
-        self.image_field = ""
-        self.image_credit = ""
+        self.image_field = []
+        self.image_credit = []
 
+    # Adds image path and credit values to beginning of a post or the Post object
     def addImage(self,path,credit,custom): 
         path ="/media" + path       
-        imageDiv = """<div class="imageWrap"><img src="%s" />%s</div><br />""" % (path,credit)
+        imageDiv = """<div class="imageWrap"><img src="%s" />%s</div>""" % (path,credit)
         if custom:
             self.image_custom = True
-            self.image_field = path 
+            new_image = {}
+            new_image['path'] = path
+            new_image['credit'] = credit
+            self.image_field.append(new_image)
         if not custom:
             self.content_encoded = imageDiv + self.content_encoded
 
@@ -173,7 +180,16 @@ class Post:
                     </wp:postmeta>
             """ % (self.creator)
             item = item + addendum
-
+            
+        if self.image_custom:
+            for key, image in self.image_field:
+                addendum = """
+                        <wp:postmeta>
+                            <wp:meta_key>image</wp:meta_key>
+                            <wp:meta_value>%s</wp:meta_value>
+                        </wp:postmeta>
+                """ % (image['path']+'{}'+image['credit'])
+                item = item + addendum
 
         ending = """
             	</item>
@@ -745,7 +761,7 @@ def importStories(verbose=False):
     return version,stories,images
 
 def convertRaw(answer):
-    if answer == "y" or answer == "yes":
+    if answer == "y" or answer == "yes" or answer == "Y":
         return True
     else:
         return False

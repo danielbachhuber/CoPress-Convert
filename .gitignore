@@ -3,4 +3,4 @@ media.csv
 stories.csv
 
 # Ignore output folder and files
-output/*
+Output/*
