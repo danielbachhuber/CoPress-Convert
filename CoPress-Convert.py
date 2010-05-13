@@ -18,9 +18,9 @@ Released under GNU General Public License, version 2 (that's what WordPress uses
 """
 import csv
 import time
-import datetime
-import time
+from datetime import datetime
 import os
+import sys
 from pprint import pprint
 
 # Helps to replace characters
@@ -87,7 +87,7 @@ class Post:
 
     def convertDate(self,datestring):
         try:
-            converted_date = datetime.strptime(datestring,"%b  %d %Y %I:%M%p")
+            converted_date = datetime.strptime(datestring,"%b %d %Y %I:%M%p")
             return converted_date
         except:
             try:
@@ -106,14 +106,18 @@ class Post:
                             converted_date = datetime.strptime(datestring,"%Y-%m-%d %H:%M:%S")
                             return converted_date
                         except:
-							try:
-								print "Attempting to process Unix time."
-								datestring = float(datestring)
-								converted_date = datetime.fromtimestamp(datestring) # Converting Unix time
-								return converted_date
-							except:
-								print "ERROR PROCESSING DATE"
-								print datestring + " does not match any of our possible date formats."
+                             try:
+                                 converted_date = datetime.strptime(datestring,"%b %d %Y %I:%M%p")
+                                 return converted_date
+                             except:
+                                  try:
+                                      print "Attempting to process Unix time."
+                                      datestring = float(datestring)
+                                      converted_date = datetime.fromtimestamp(datestring) # Converting Unix time
+                                      return converted_date
+                                  except:
+        								print "ERROR PROCESSING DATE"
+        								print datestring + " does not match any of our possible date formats."
 
     def checkID(self,identification_num):
         return self.identification_num == identification_num
