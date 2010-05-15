@@ -445,23 +445,28 @@ def createStructures(CategoryList,PostList,stories,verbose,start_date):
         post_excerpt = story[4]
         post_content = story[5]
         subheadline = story[7]
+        
+        categories = category.split(':')
+        all_categories = []
 
-
-
-        unique_category = True
-        for existing_category in CategoryList:
-            if category == existing_category.get_name():
-                unique_category = False
-
-        if unique_category:
-            if verbose:
-                print "Adding a new category."
-                print "     category name: " + category
+        # For each category that isn't empty, check whether it's unique and append it to the Post object
+        for category in categories:
+          if category != '':
+            unique_category = True
+            for existing_category in CategoryList:
+              if category == existing_category.get_name():
+                  unique_category = False
+                
             newCategory = Category(category)
-            CategoryList.append(newCategory)
-
-        categories = [Category(category)]
-        newPost = Post(post_id,categories,user,post_date,post_content,post_title,post_excerpt,identification_num)
+            all_categories.append(newCategory)
+          
+            if unique_category:
+              if verbose:
+                  print "Adding a new category."
+                  print "     category name: " + category
+              CategoryList.append(newCategory)
+					
+        newPost = Post(post_id,all_categories,user,post_date,post_content,post_title,post_excerpt,identification_num)
 
         #if (newPost.pubDate >= start_date):
         #    if verbose:
