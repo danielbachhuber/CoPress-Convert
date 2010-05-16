@@ -4,16 +4,15 @@
 convert.py
 
 Created by Miles Skorpen on 2009-07-01
-Contributed to by Albert Sun, Will Davis, Daniel Bachhuber, Max Cutler
+Maintained by Daniel Bachhuber, danielbachhuber@gmail.com
+Contributed to by Albert Sun, Will Davis, Max Cutler
 Version 0.9
 Copyright (c) 2010 CoPress
 Released under GNU General Public License, version 2 (that's what WordPress uses!)
 
-@todo Prepare README file on usage of script
-@todo Add mad commentsto to the script
-@todo Abstract settings/options to be read from top of file instead of prompting every time
-@todo Fix processing and import of categories
-@todo Ensure CP5 images are being handled properly
+@todo Add mad comments to to the script
+@todo Abstract settings/options to be read from top of file or a separate file instead of prompting every time
+@todo Fix handling of CP5 images when inserting into post. See issue #3 on Github
 
 """
 import csv
@@ -50,7 +49,7 @@ class Post:
 
         self.guid = ""
         self.guid_is_permalink = "false"
-        self.description = "A post imported by CoPress."
+        self.description = "A post imported by CoPress Convert."
         self.content_encoded = post_content
         self.excerpt_encoded = post_excerpt
 
