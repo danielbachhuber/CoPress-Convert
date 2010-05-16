@@ -74,8 +74,6 @@ class Post:
 
     # Adds image path and credit values to beginning of a post or the Post object
     def addImage(self,path,credit,custom): 
-        path ="/media" + path       
-        imageDiv = """<div class="imageWrap"><img src="%s" />%s</div>""" % (path,credit)
         if custom:
             self.image_custom = True
             new_image = {}
@@ -83,6 +81,8 @@ class Post:
             new_image['credit'] = credit
             self.image_field.append(new_image)
         if not custom:
+            path ="/media" + path       
+            imageDiv = """<div class="imageWrap"><img src="%s" />%s</div>""" % (path,credit)
             self.content_encoded = imageDiv + self.content_encoded
 
     def convertDate(self,datestring):
