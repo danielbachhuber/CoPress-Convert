@@ -8,7 +8,7 @@ Past contributor(s): Miles Skorpen, Albert Sun, Will Davis, Max Cutler
 
 The CoPress conversion script enables you to convert College Publisher 4, College Publisher 5, and other databases to WordPress eXtended RSS files you can easily import into your existing WordPress website. Quickly and easily migrate your all of your full content data and metadata to a format you can one-click upload into WordPress.
 
-This script can save you hours, if not days, of work migrating your content into WordPress.
+This script can save you hours, if not days, of work migrating your content into WordPress. The final results will not be flawless, however. Frequently, the features available in WordPress and other systems do not perfectly line up, and touch-up would be necessary.
 
 Send suggestions, feature requests, improvements, or bugs to danielbachhuber@gmail.com, or file them on Github http://github.com/danielbachhuber/CoPress-Convert/issues 
 
@@ -30,7 +30,7 @@ With those things in mind, here's how you convert your data:
 ** Verbose results will print the output of the script to the screen. This is generally only useful if you need to debug; it makes the entire script run a lot slower otherwise.
 ** If you only want to import a part of your archives, you specify a date to start from.
 ** Choose whether or not to import images with this conversion. You'll later be able to specify whether they should be added to the post or appended as custom fields.
-** There's a "Run a test" option but we're not entirely sure what that does. You can just decline.
+** There's a "Run a test" option which will output a test database with default settings to make sure that the database will convert. We recommend running this if repeated iterations are necessary for database are debugging, but these setting should not be used for your final website. If you choose to run a test, you will not be asked to fill in any the settings.
 ** Add the root URL to your website. This is especially important if you're importing a custom database.
 ** Indicate whether you want authors imported as users or custom fields. The latter is recommended for databases with 500+ users because, as of 2.9.2, WordPress is not optimized for importing a large number of authors as users.
 ** Indicate whether you want images imported into each post or appended as custom fields. Custom fields will give you more flexibility over how the images are presented.
@@ -41,6 +41,31 @@ With those things in mind, here's how you convert your data:
 9) If you imported authors as custom fields, that data is stored in a custom field called "author". Likewise, images imported as custom fields are storied in a custom field called "image." You'll need to add PHP to your WordPress theme in order to expose this information where it exists.
 
 If you completed, all of the steps above successfully, congratulations! You've migrated your database.
+
+== How To Use Data Saved In Custom Fields == 
+
+If, in the conversion process, you indicate you'd like either authors or images stored in custom fields, there will be a small amount of additional work you'll need to do. Custom fields make WordPress significantly more flexible, but your theme will need to be modified to handle the data properly.
+
+For exposing author information, you can use a snippet like this:
+
+<?php $author = get_post_meta($post->ID, 'author', true);
+if ($author) { echo $author; } else { the_author(); } ?>
+
+What this snippet will do is show the author metadata if it exists in a custom field, otherwise show the WordPress saved user information.
+
+For exposing images, the snippet is a little bit more complex:
+
+<?php $images = get_post_meta($post->ID, 'image');
+foreach (images as image) {
+  $image = explode('{}', $image);
+  echo '<div class="image"><img src="/media/' . $image[0] '" />';
+  if ($image[1]) {
+    echo '<p class="credit">' . $image[1] . '</p>';
+  }
+  echo '</div>';
+} ?>
+
+Basically, what this snippet does is gets one or multiple custom fields with the key "image", and then displays each image and credit if available.
 
 == Frequently Asked Questions ==
 
