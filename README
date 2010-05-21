@@ -1,5 +1,5 @@
 === CoPress Convert ===
-Version 1.9
+Version 1.0
 
 Current maintainer(s): Daniel Bachhuber
 Past contributor(s): Miles Skorpen, Albert Sun, Will Davis, Max Cutler
@@ -72,6 +72,9 @@ Basically, what this snippet does is gets one or multiple custom fields with the
 Hooray! There aren't any frequently asked questions yet.
 
 == Changelog ==
+
+= Version 1.0 = 
+* Fixed issue with CP5 image paths and inserting into posts
 
 = Version 0.9 =
 * Fixed adding images as custom fields for both CP4 and CP4
