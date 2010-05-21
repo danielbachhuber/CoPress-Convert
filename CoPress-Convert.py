@@ -6,13 +6,13 @@ convert.py
 Created by Miles Skorpen on 2009-07-01
 Maintained by Daniel Bachhuber, danielbachhuber@gmail.com
 Contributed to by Albert Sun, Will Davis, Max Cutler
-Version 0.9
+Version 1.0
 Copyright (c) 2010 CoPress
 Released under GNU General Public License, version 2 (that's what WordPress uses!)
 
 @todo Add mad comments to to the script
 @todo Abstract settings/options to be read from top of file or a separate file instead of prompting every time
-@todo Fix handling of CP5 images when inserting into post. See issue #3 on Github
+@todo Make the output size customizable
 
 """
 import csv
@@ -80,6 +80,8 @@ class Post:
             new_image['credit'] = credit
             self.image_field.append(new_image)
         if not custom:
+            if not path.startswith('/'):
+                path = '/' + path
             path ="/media" + path       
             imageDiv = """<div class="imageWrap"><img src="%s" />%s</div>""" % (path,credit)
             self.content_encoded = imageDiv + self.content_encoded

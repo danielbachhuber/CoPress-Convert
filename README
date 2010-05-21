@@ -1,5 +1,5 @@
 === CoPress Convert ===
-Version 0.9
+Version 1.9
 
 Current maintainer(s): Daniel Bachhuber
 Past contributor(s): Miles Skorpen, Albert Sun, Will Davis, Max Cutler
@@ -58,7 +58,7 @@ For exposing images, the snippet is a little bit more complex:
 <?php $images = get_post_meta($post->ID, 'image');
 foreach (images as image) {
   $image = explode('{}', $image);
-  echo '<div class="image"><img src="/media/' . $image[0] '" />';
+  echo '<div class="image"><img src="/media' . $image[0] '" />';
   if ($image[1]) {
     echo '<p class="credit">' . $image[1] . '</p>';
   }
