@@ -56,7 +56,7 @@ What this snippet will do is show the author metadata if it exists in a custom f
 For exposing images, the snippet is a little bit more complex:
 
 <?php $images = get_post_meta($post->ID, 'image');
-foreach (images as image) {
+foreach ($images as $image) {
   $image = explode('{}', $image);
   echo '<div class="image"><img src="/media' . $image[0] '" />';
   if ($image[1]) {
