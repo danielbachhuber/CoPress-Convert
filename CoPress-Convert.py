@@ -6,7 +6,7 @@ convert.py
 Created by Miles Skorpen on 2009-07-01
 Maintained by Daniel Bachhuber, danielbachhuber@gmail.com
 Contributed to by Albert Sun, Will Davis, Max Cutler
-Version 1.0
+Version 1.1a
 Copyright (c) 2010 CoPress
 Released under GNU General Public License, version 2 (that's what WordPress uses!)
 
@@ -745,18 +745,31 @@ def importStories(verbose=False):
                     line[cp5_map['Subtitle']],
                 ]
 
-                for imagecolumn in cp5_map['images']:
-                    imageline = line[imagecolumn].strip()
+                try:
+                    for imagecolumn in cp5_map['images']:
+                        imageline = line[imagecolumn].strip()
+                        if len(imageline) > 0:
+                            try:
+                                imageinfo = imageline.split(':')
+                                filename = imageinfo[1]
+                                credit = imageinfo[4]
+
+                                image = [content_id,filename,credit]
+                                images.append(image)
+                            except:
+                                print 'Error on %d image' % i
+                except:
+                    imageline = line[cp5_map['images']].strip()
                     if len(imageline) > 0:
                         try:
-                            imageinfo = imageline.split(':')
-                            filename = imageinfo[1]
-                            credit = imageinfo[4]
+                           imageinfo = imageline.split(':')
+                           filename = imageinfo[1]
+                           credit = imageinfo[4]
 
-                            image = [content_id,filename,credit]
-                            images.append(image)
+                           image = [content_id,filename,credit]
+                           images.append(image)
                         except:
-                            print 'Error on %d image' % i
+                           print 'Error on %d image' % i
 
                 # if line[7] != "" and line[8] != "imageexists":
                 #     filename = line[7]
