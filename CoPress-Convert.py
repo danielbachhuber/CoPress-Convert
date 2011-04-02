@@ -508,25 +508,19 @@ def addImages(PostList,images,settings):
         for image in media:
             i += 1
             firstImg = True
-            identification_num = image[0]
-            for idNum in completeList:
-                if idNum == identification_num:
-                    firstImg = False
-            if firstImg:
-                added += 1
-                completeList.append(identification_num)
-                for Post in PostList:
-                    if Post.checkID(identification_num):
-                        if settings['verbose_results'] and firstImg:
-                            print "Adding image to a post."
-                            print "     Image # " + str(i)
-                            print "     Post ID " + str(identification_num)
-                        filename = image[1]
-                        caption = image[2]
-                        credit = image[3]
-                        Post.addImage(filename,caption,credit,settings)
-            else:
-                skipped += 1
+            identification_num = image[0] 
+            completeList.append(identification_num)
+            for Post in PostList:
+                if Post.checkID(identification_num):
+                    if settings['verbose_results'] and firstImg:
+                        print "Adding image to a post."
+                        print "     Image # " + str(i)
+                        print "     Post ID " + str(identification_num)
+                    filename = image[1]
+                    caption = image[2]
+                    credit = image[3]
+                    Post.addImage(filename,caption,credit,settings)
+                    added += 1
         print "Done with images."
         print "          total: "+str(i)
         print "       inserted: "+str(added)
