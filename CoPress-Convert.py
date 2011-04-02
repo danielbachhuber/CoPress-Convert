@@ -80,7 +80,7 @@ class Post:
             new_image['path'] = path
             new_image['credit'] = credit
             self.image_field.append(new_image)
-        if settings['image_association'] != 'custom field':
+        if settings['image_association'] == 'insert':
             if not path.startswith('/'):
                 path = '/' + path
             path ="/media" + path       
