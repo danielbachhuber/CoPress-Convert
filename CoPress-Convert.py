@@ -613,7 +613,7 @@ def writeFiles(SiteInfo,PostList,CategoryList,settings):
             x = x + 1
         i = i+1
         xml_file.write(postObj.get_item(settings))
-        if i == 300: # Splits files to make sure they don't get too big.
+        if i == settings['posts_per_file']: # Splits files to make sure they don't get too big.
             xml_file.write(xml_end)
             i = 0
 
@@ -888,6 +888,14 @@ def configureSettings():
                 settings['import_start_date'] = datetime.datetime.strptime(start_date,"%Y-%m-%d")
             except:
                 settings['import_start_date'] == ''
+                
+    # Posts per file (deals with file size)
+    try:
+        settings['posts_per_file'] = config.getint('basic', 'posts_per_file')
+        print "Posts per file: " + settings['posts_per_file']        
+    except:
+        settings['posts_per_file'] = 300
+         print "Posts per file: " + settings['posts_per_file']
             
     return settings
 
