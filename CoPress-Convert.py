@@ -73,14 +73,14 @@ class Post:
         self.image_credit = []
 
     # Adds image path and credit values to beginning of a post or the Post object
-    def addImage(self,path,credit,custom): 
-        if custom:
+    def addImage(self,path,credit,settings): 
+        if settings['image_association'] == 'custom field':
             self.image_custom = True
             new_image = {}
             new_image['path'] = path
             new_image['credit'] = credit
             self.image_field.append(new_image)
-        if not custom:
+        if settings['image_association'] != 'custom field':
             if not path.startswith('/'):
                 path = '/' + path
             path ="/media" + path       
@@ -124,9 +124,9 @@ class Post:
     def checkID(self,identification_num):
         return self.identification_num == identification_num
 
-    def get_item(self,author):
+    def get_item(self,settings):
         creator = self.creator
-        if not author:
+        if settings['author_association'] == 'custom field':
             creator = "defaultuser"
         if creator == "":
             creator = "defaultuser"
@@ -154,7 +154,7 @@ class Post:
                     <wp:post_type>%s</wp:post_type>
                     <wp:post_password>%s</wp:post_password>
                     <wp:postmeta>
-                        <wp:meta_key>_id</wp:meta_key>
+                        <wp:meta_key>_cc_article_id</wp:meta_key>
                         <wp:meta_value>%s</wp:meta_value>
                     </wp:postmeta>
                 """ % ( self.title,
@@ -179,23 +179,23 @@ class Post:
                         self.wp_post_type,
                         self.wp_post_password,
                         self.identification_num )
-        if not author:
+        if settings['author_association'] == 'custom field':
             addendum = """
                     <wp:postmeta>
-                        <wp:meta_key>author</wp:meta_key>
+                        <wp:meta_key>%s</wp:meta_key>
                         <wp:meta_value>%s</wp:meta_value>
                     </wp:postmeta>
-            """ % (self.creator)
+            """ % (settings['author_custom_field'], self.creator)
             item = item + addendum
             
         if self.image_custom:
             for image in self.image_field:
                 addendum = """
                         <wp:postmeta>
-                            <wp:meta_key>image</wp:meta_key>
+                            <wp:meta_key>%s</wp:meta_key>
                             <wp:meta_value>%s</wp:meta_value>
                         </wp:postmeta>
-                """ % (image['path']+'{}'+image['credit'])
+                """ % (settings['image_custom_field'], image['path']+'{}'+image['credit'])
                 item = item + addendum
 
         ending = """
@@ -426,8 +426,8 @@ def addCat(CategoryList,category):
         CategoryList.append(newCategory)
     return CategoryList
 
-def createStructures(CategoryList,PostList,stories,verbose,start_date):
-    if verbose:
+def createStructures(CategoryList,PostList,stories,settings):
+    if settings['verbose_results']:
         print " "
         print " "
         print "                BEGINNING TO ADD NEW CONTENT"
@@ -463,15 +463,15 @@ def createStructures(CategoryList,PostList,stories,verbose,start_date):
             all_categories.append(newCategory)
           
             if unique_category:
-              if verbose:
+              if settings['verbose_results']:
                   print "Adding a new category."
                   print "     category name: " + category
               CategoryList.append(newCategory)
                     
         newPost = Post(post_id,all_categories,user,post_date,post_content,post_title,post_excerpt,identification_num)
 
-        #if (newPost.pubDate >= start_date):
-        #    if verbose:
+        #if (newPost.pubDate >= import_start_date):
+        #    if settings['verbose_results']:
         #        print "Adding a new post."
         #        print "     from story " + str(story[0])
         #        print "     idNumber:  " + str(post_id)
@@ -481,8 +481,8 @@ def createStructures(CategoryList,PostList,stories,verbose,start_date):
     print str(len(PostList))+" posts added."
     return CategoryList,PostList
 
-def addImages(PostList,images,verbose,image_custom):
-    if verbose:
+def addImages(PostList,images,settings):
+    if settings['verbose_results']:
         print " "
         print " "
         print "                BEGINNING TO ADD NEW IMAGES"
@@ -516,12 +516,12 @@ def addImages(PostList,images,verbose,image_custom):
                 completeList.append(identification_num)
                 for Post in PostList:
                     if Post.checkID(identification_num):
-                        if verbose and firstImg:
+                        if settings['verbose_results'] and firstImg:
                             print "Adding image to a post."
                             print "     Image # " + str(i)
                             print "     Post ID " + str(identification_num)
                         credit = image[3]
-                        Post.addImage(image[1],credit,image_custom)
+                        Post.addImage(image[1],credit,settings)
             else:
                 skipped += 1
         print "Done with images."
@@ -538,13 +538,13 @@ def addImages(PostList,images,verbose,image_custom):
             for Post in PostList:
                 try:
                     if Post.checkID(identification_num):
-                        if verbose:
+                        if settings['verbose_results']:
                             print "Adding image to a post."
                             print "     File    " + filename
                             print "     Image # " + str(i)
                             print "     Post ID " + str(identification_num)
                         credit = credit.replace("'","\\'")
-                        Post.addImage(filename,credit,image_custom)
+                        Post.addImage(filename,credit,settings)
                 except:
                     pass
         print "Done with images."
@@ -561,7 +561,7 @@ def createFile(name,header,meta,categories):
 
     return xml_file
 
-def writeFiles(SiteInfo,PostList,CategoryList,author):
+def writeFiles(SiteInfo,PostList,CategoryList,settings):
     # Now to add the meat ...
 
     print "Creating the XML Files ..."
@@ -612,13 +612,13 @@ def writeFiles(SiteInfo,PostList,CategoryList,author):
             xml_file = createFile(name,header,metadata,category)
             x = x + 1
         i = i+1
-        xml_file.write(postObj.get_item(author))
+        xml_file.write(postObj.get_item(settings))
         if i == 300: # Splits files to make sure they don't get too big.
             xml_file.write(xml_end)
             i = 0
 
 
-def importStories(verbose=False):
+def importStories(settings):
     print "Beginning to read in the stories database."
 
     """
@@ -659,7 +659,7 @@ def importStories(verbose=False):
     # print open('stories.csv').read().replace("\0", ">>>NUL<<<")
     # x = 1/0
 
-    if verbose:
+    if settings['verbose_results']:
         print " "
         print " "
         print "                BEGINNING TO READ IN STORIES                  "
@@ -698,7 +698,7 @@ def importStories(verbose=False):
                                 cp5_map['comments'].append(c)
                             elif 'Image' in column:
                                 cp5_map['images'].append(c)
-            if verbose:
+            if settings['verbose_results']:
                 print " ############################################################ "
                 print " ############################################################ "
                 print "                     CP"+str(version)+"                       "
@@ -712,7 +712,7 @@ def importStories(verbose=False):
                 print " "
             i += 1
         else:
-            if verbose:
+            if settings['verbose_results']:
                 x = 0
                 for bit in line:
                     print str(x)+"     "+bit
@@ -723,7 +723,7 @@ def importStories(verbose=False):
                 story = [line[0],line[2],line[3],line[4],line[6],line[7],line[8],line[5]]
 
             if version == 5:
-                if verbose: "Cleaning CP5 data"
+                if settings['verbose_results']: "Cleaning CP5 data"
                 content_id = line[0]
                 if content_id[0] == "m":
                     content_id = content_id.split(".")
@@ -794,94 +794,134 @@ def convertRaw(answer):
 
 def configureSettings():
     config = ConfigParser.RawConfigParser()
-    # Try to read any values from the config file
     settings = {}
+    # (optional) Use a config file
     settings['config_file'] = raw_input("Please enter config filename (optional): ")
-    if settings['config_file']:
-        while settings['config_file']:
+    while settings['config_file']:
+        try:
+            config.readfp(open(settings['config_file']))
+            config.read(settings['config_file'])
+            break
+        except:
+            settings['config_file'] = raw_input("Invalid file. Please enter config filename (optional): ")
+    
+    # Archives format
+    settings['archives_format'] = False
+    # @todo There's probably an easier way to see if it's a part of a list. Or we could check the format for the user
+    while settings['archives_format'] != 'cp4' and settings['archives_format'] != 'cp5' and settings['archives_format'] != 'custom':
+        try:
+            settings['archives_format'] = config.get('basic', 'archives_format')
+            print "Your archive format is: " + settings['archives_format']
+        except:
+            settings['archives_format'] = raw_input("What format are your archives? 'cp4', 'cp5' or 'custom': ")
+
+    # Website URL
+    settings['website_url'] = ''
+    # @todo Check if it's a valid URL
+    while settings['website_url'] == '':
+        try:
+            settings['website_url'] = config.get('basic', 'website_url')
+            print "Your website URL is: " + settings['website_url']
+        except:
+            settings['website_url'] = raw_input("What is your new website's URL: ")
+    
+    # Verbose results
+    try:
+        settings['verbose_results'] = config.getboolean('basic', 'verbose_results')
+        print "Show verbose results: " + settings['verbose_results']        
+    except:
+        settings['verbose_results'] = raw_input("Do you want verbose results? (Y/n): ")
+        settings['verbose_results'] = convertRaw(settings['verbose_results'])
+    
+    
+    # Author settings
+    settings['author_association'] = False
+    while settings['author_association'] == False:
+        try:
+            settings['author_association'] = config.get('basic', 'author_association')
+            print "Authors will be associated with posts as: " + settings['author_association']
+        except:
+            settings['author_association'] = raw_input("How should authors be associated with posts? ('custom field' or 'user'): ")
+            if settings['author_association'] != 'custom field' and settings['author_association'] != 'user':
+                settings['author_association'] = False
+    
+    # (optional) Which custom field to store the images in
+    settings['author_custom_field'] = ''
+    if settings['author_association'] == 'custom field':
+        while settings['author_custom_field'] == '':
             try:
-                config.readfp(open(settings['config_file']))
-                break
+                settings['author_custom_field'] = config.get('basic', 'author_custom_field')
+                print "Authors will be stored in this custom field: " + settings['author_custom_field']
             except:
-                settings['config_file'] = raw_input("Invalid. Please enter config filename (optional): ")
-    else:
-         print "Hello!"   
+                settings['author_custom_field'] = raw_input("Which custom field should authors be stored in?: ")
+    
+    # Image settings
+    settings['image_association'] = False
+    while settings['image_association'] == False:
+        try:
+            settings['image_association'] = config.get('basic', 'image_association')
+            print "Images will be associated with posts as: " + settings['image_association']
+        except:
+            settings['image_association'] = raw_input("How should images be associated with posts? ('custom field' or 'insert'): ")
+            if settings['image_association'] != 'custom field' and settings['image_association'] != 'insert':
+                settings['image_association'] = False
+    
+    # (optional) Which custom field to store the images in
+    settings['image_custom_field'] = ''
+    if settings['image_association'] == 'custom field':
+        while settings['image_custom_field'] == '':
+            try:
+                settings['image_custom_field'] = config.get('basic', 'image_custom_field')
+                print "Images will be stored in this custom field: " + settings['image_custom_field']
+            except:
+                settings['image_custom_field'] = raw_input("Which custom field should images be stored in?: ")
+    
+    # (optional) Import start date
+    settings['import_start_date'] = False
+    while settings['import_start_date'] == False:
+        try:
+            settings['import_start_date'] = config.get('basic', 'import_start_date')
+            print "Posts will be added from this day forward: " + settings['author_custom_field']
+        except:
+            settings['import_start_date'] = raw_input("Would you like to specify a start date for your import? (optional, YYYY-MM-DD): ")
+            try:
+                settings['import_start_date'] = datetime.datetime.strptime(start_date,"%Y-%m-%d")
+            except:
+                settings['import_start_date'] == ''
+            
     return settings
 
 def main():
     print "Welcome to the College Publisher database converter, from CoPress Inc. ( http://copress.org )"
     settings = configureSettings()
-    sys.exit()
-    if config_file:
-        try:
-            config.read(config_file)
-        except:
-            print ""
-        
-    try:
-        config.get('basic', 'archives_format')
-        archives_format = config.get('basic', 'archives_format')
-        print "Format of archives to be converted: " + archives_format
-    except:
-        archives_format = raw_input("Please enter your archives format: ")
-
-    sys.exit()
-    if archives_format != 'cp4' and archives_format != 'cp5':
-        
+    
+    if settings['archives_format'] != 'cp4' and settings['archives_format'] != 'cp5':
         CategoryList,PostList = custom(want_custom)
-        default_link = raw_input("What is your root URL? ")
-        author = True
     else:
         PostList = []
         CategoryList = []
-        author = True
-        image_custom = True
         print "This script will create a WordPress eXtended RSS file."
         print "You can merge it with your existing site easily."
 
-        verbose = raw_input("Do you want verbose results? (y/n) ")
-        verbose = convertRaw(verbose)
+        version,stories,images = importStories(settings)
 
-        start_date = raw_input("Do you want to specify a date to start importing from? (YYYY-MM-DD) (leave blank for all) ")
-        if start_date == '':
-            start_date = start_date
-        else:
-            start_date = datetime.datetime.strptime(start_date,"%Y-%m-%d")
-
-        include_images = raw_input("Do you want to include images? (y/n) ")
-        include_images = convertRaw(include_images)
-
-
-        test = raw_input("Do you want to run a test? (y/n) ")
-        test = convertRaw(test)
-
-        if test:
-            default_link = ""
-        else:
-            default_link = raw_input("What is your root URL? ")
-            author = raw_input("Should authors be users (otherwise they'll be stored as a custom field)? (y/n) ")
-            author = convertRaw(author)
-            image_custom = raw_input("Should images be saved as custom fields (otherwise they'll be inserted into posts)? (y/n) ")
-            image_custom = convertRaw(image_custom)
-
-        version,stories,images = importStories(verbose)
-
-        CategoryList,PostList = createStructures(CategoryList,PostList,stories,verbose,start_date)
-        if include_images:
-            PostList = addImages(PostList,images,verbose,image_custom)
+        CategoryList,PostList = createStructures(CategoryList,PostList,stories,settings)
+        
+        # Add the images to all of the posts
+        PostList = addImages(PostList,images,settings)
 
     SiteInfo = """
 <title>CoPress Import</title>
 <link>%s</link>
 <pubDate>%s</pubDate>
-<generator>CoPress Convert (v 0.9)</generator>
+<generator>CoPress Convert (v 1.1a)</generator>
 <language>en</language>
 <wp:wxr_version>1.0</wp:wxr_version>
 <wp:base_site_url>%s</wp:base_site_url>
 <wp:base_blog_url>%s</wp:base_blog_url>
-                """ % (default_link,time.strftime("%Y-%m-%d %I:%M%p",time.localtime()),default_link,default_link)
+                """ % (settings['website_url'],time.strftime("%Y-%m-%d %I:%M%p",time.localtime()),settings['website_url'],settings['website_url'])
 
-    writeFiles(SiteInfo,PostList,CategoryList,author)
+    writeFiles(SiteInfo,PostList,CategoryList,settings)
 
     print ""
     print ""
