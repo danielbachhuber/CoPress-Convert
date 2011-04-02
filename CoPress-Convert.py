@@ -127,9 +127,9 @@ class Post:
     def get_item(self,settings):
         creator = self.creator
         if settings['author_association'] == 'custom field':
-            creator = "defaultuser"
+            creator = "publicationarchive"
         if creator == "":
-            creator = "defaultuser"
+            creator = "publicationarchive"
 
         item = """
                 <item>
