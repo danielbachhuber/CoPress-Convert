@@ -73,7 +73,7 @@ class Post:
         self.image_credit = []
 
     # Adds image path and credit values to beginning of a post or the Post object
-    def addImage(self,path,credit,settings):
+    def addImage(self,path,caption,credit,settings):
         if not path.startswith('/'):
             path = '/' + path
         path = settings['prepend_image_file_path'] + path
@@ -81,6 +81,7 @@ class Post:
             self.image_custom = True
             new_image = {}
             new_image['path'] = path
+            new_image['caption'] = caption
             new_image['credit'] = credit
             self.image_field.append(new_image)
         if settings['image_association'] == 'insert':
@@ -195,7 +196,7 @@ class Post:
                             <wp:meta_key>%s</wp:meta_key>
                             <wp:meta_value>%s</wp:meta_value>
                         </wp:postmeta>
-                """ % (settings['image_custom_field'], image['path']+'{}'+image['credit'])
+                """ % (settings['image_custom_field'], image['path']+'{}'+image['caption']+'{}'+image['credit'])
                 item = item + addendum
 
         ending = """
@@ -520,8 +521,10 @@ def addImages(PostList,images,settings):
                             print "Adding image to a post."
                             print "     Image # " + str(i)
                             print "     Post ID " + str(identification_num)
+                        filename = image[1]
+                        caption = image[2]
                         credit = image[3]
-                        Post.addImage(image[1],credit,settings)
+                        Post.addImage(filename,credit,settings)
             else:
                 skipped += 1
         print "Done with images."
@@ -543,8 +546,9 @@ def addImages(PostList,images,settings):
                             print "     File    " + filename
                             print "     Image # " + str(i)
                             print "     Post ID " + str(identification_num)
+                        caption = None
                         credit = credit.replace("'","\\'")
-                        Post.addImage(filename,credit,settings)
+                        Post.addImage(filename,caption,credit,settings)
                 except:
                     pass
         print "Done with images."
@@ -894,7 +898,7 @@ def configureSettings():
         settings['prepend_image_file_path'] = config.get('basic', 'prepend_image_file_path')
         print "File path to be prepended to images: " + settings['prepend_image_file_path']        
     except:
-        settings['prepend_image_file_path'] = '/media'
+        settings['prepend_image_file_path'] = '/wp-content/uploads'
         print "File path to be prepended to images: " + settings['prepend_image_file_path'] 
                 
     # Posts per file (deals with file size)
