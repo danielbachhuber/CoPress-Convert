@@ -73,7 +73,10 @@ class Post:
         self.image_credit = []
 
     # Adds image path and credit values to beginning of a post or the Post object
-    def addImage(self,path,credit,settings): 
+    def addImage(self,path,credit,settings):
+        if not path.startswith('/'):
+            path = '/' + path
+        path = settings['prepend_image_file_path'] + path
         if settings['image_association'] == 'custom field':
             self.image_custom = True
             new_image = {}
@@ -81,9 +84,6 @@ class Post:
             new_image['credit'] = credit
             self.image_field.append(new_image)
         if settings['image_association'] == 'insert':
-            if not path.startswith('/'):
-                path = '/' + path
-            path ="/media" + path       
             imageDiv = """<div class="image-wrap"><img src="%s" />%s</div>""" % (path,credit)
             self.content_encoded = imageDiv + self.content_encoded
 
@@ -888,6 +888,14 @@ def configureSettings():
                 settings['import_start_date'] = datetime.datetime.strptime(start_date,"%Y-%m-%d")
             except:
                 settings['import_start_date'] == ''
+                
+    # Prepend image file path (deals with file size)
+    try:
+        settings['prepend_image_file_path'] = config.get('basic', 'prepend_image_file_path')
+        print "File path to be prepended to images: " + settings['prepend_image_file_path']        
+    except:
+        settings['prepend_image_file_path'] = '/media'
+        print "File path to be prepended to images: " + settings['prepend_image_file_path'] 
                 
     # Posts per file (deals with file size)
     try:
