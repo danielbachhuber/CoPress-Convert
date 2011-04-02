@@ -524,7 +524,7 @@ def addImages(PostList,images,settings):
                         filename = image[1]
                         caption = image[2]
                         credit = image[3]
-                        Post.addImage(filename,credit,settings)
+                        Post.addImage(filename,caption,credit,settings)
             else:
                 skipped += 1
         print "Done with images."
@@ -904,10 +904,12 @@ def configureSettings():
     # Posts per file (deals with file size)
     try:
         settings['posts_per_file'] = config.getint('basic', 'posts_per_file')
-        print "Posts per file: " + settings['posts_per_file']        
+        print "Posts per file: "
+        print settings['posts_per_file']        
     except:
         settings['posts_per_file'] = 300
-         print "Posts per file: " + settings['posts_per_file']
+        print "Posts per file: "
+        print settings['posts_per_file']
             
     return settings
 
