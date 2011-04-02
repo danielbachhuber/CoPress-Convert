@@ -2,5 +2,11 @@
 media.csv
 stories.csv
 
+# Ignore .pyc files
+*.pyc
+
+# Ignore the custom config file
+custom.cfg
+
 # Ignore output folder and files
 Output/*

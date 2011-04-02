@@ -21,6 +21,7 @@ from datetime import datetime
 import os
 import sys
 from pprint import pprint
+import ConfigParser
 
 # Helps to replace characters
 def replace_all(text, dic):
@@ -83,7 +84,7 @@ class Post:
             if not path.startswith('/'):
                 path = '/' + path
             path ="/media" + path       
-            imageDiv = """<div class="imageWrap"><img src="%s" />%s</div>""" % (path,credit)
+            imageDiv = """<div class="image-wrap"><img src="%s" />%s</div>""" % (path,credit)
             self.content_encoded = imageDiv + self.content_encoded
 
     def convertDate(self,datestring):
@@ -117,8 +118,8 @@ class Post:
                                       converted_date = datetime.fromtimestamp(datestring) # Converting Unix time
                                       return converted_date
                                   except:
-        								print "ERROR PROCESSING DATE"
-        								print datestring + " does not match any of our possible date formats."
+                                        print "ERROR PROCESSING DATE"
+                                        print datestring + " does not match any of our possible date formats."
 
     def checkID(self,identification_num):
         return self.identification_num == identification_num
@@ -132,27 +133,27 @@ class Post:
 
         item = """
                 <item>
-            		<title>%s</title>
-            		<link>%s</link>
-            		<pubDate>%s</pubDate>
-            		<dc:creator><![CDATA[%s]]></dc:creator>
-            		%s
-            		<guid isPermaLink="%s">%s</guid>
-            		<description>%s</description>
-            		<content:encoded><![CDATA[%s]]></content:encoded>
-            		<excerpt:encoded><![CDATA[%s]]></excerpt:encoded>
-            		<wp:post_id>%s</wp:post_id>
-            		<wp:post_date>%s</wp:post_date>
-            		<wp:post_date_gmt>%s</wp:post_date_gmt>
-            		<wp:comment_status>%s</wp:comment_status>
-            		<wp:ping_status>%s</wp:ping_status>
-            		<wp:post_name>%s</wp:post_name>
-            		<wp:status>%s</wp:status>
-            		<wp:post_parent>%s</wp:post_parent>
-            		<wp:menu_order>%s</wp:menu_order>
-            		<wp:post_type>%s</wp:post_type>
-            		<wp:post_password>%s</wp:post_password>
-            		<wp:postmeta>
+                    <title>%s</title>
+                    <link>%s</link>
+                    <pubDate>%s</pubDate>
+                    <dc:creator><![CDATA[%s]]></dc:creator>
+                    %s
+                    <guid isPermaLink="%s">%s</guid>
+                    <description>%s</description>
+                    <content:encoded><![CDATA[%s]]></content:encoded>
+                    <excerpt:encoded><![CDATA[%s]]></excerpt:encoded>
+                    <wp:post_id>%s</wp:post_id>
+                    <wp:post_date>%s</wp:post_date>
+                    <wp:post_date_gmt>%s</wp:post_date_gmt>
+                    <wp:comment_status>%s</wp:comment_status>
+                    <wp:ping_status>%s</wp:ping_status>
+                    <wp:post_name>%s</wp:post_name>
+                    <wp:status>%s</wp:status>
+                    <wp:post_parent>%s</wp:post_parent>
+                    <wp:menu_order>%s</wp:menu_order>
+                    <wp:post_type>%s</wp:post_type>
+                    <wp:post_password>%s</wp:post_password>
+                    <wp:postmeta>
                         <wp:meta_key>_id</wp:meta_key>
                         <wp:meta_value>%s</wp:meta_value>
                     </wp:postmeta>
@@ -198,9 +199,9 @@ class Post:
                 item = item + addendum
 
         ending = """
-            	</item>
-    	"""
-    	item = item + ending
+                </item>
+        """
+        item = item + ending
 
         return item
 
@@ -216,20 +217,20 @@ class Category:
     def get_item(self):
         item = """
                 <wp:category>
-                	<wp:category_nicename>%s</wp:category_nicename>
-                	<wp:category_parent>%s</wp:category_parent>
-                	<wp:cat_name><![CDATA[%s]]></wp:cat_name>
+                    <wp:category_nicename>%s</wp:category_nicename>
+                    <wp:category_parent>%s</wp:category_parent>
+                    <wp:cat_name><![CDATA[%s]]></wp:cat_name>
                 </wp:category>
                 """ % ( self.category_nicename,
                         self.category_parent,
                         self.category_name )     
         return item
     def get_postitem(self):
-    	item = """
-    			<category><![CDATA[%s]]></category>
-     			<category domain="%s" nicename="%s"><![CDATA[%s]]></category>
-     			""" % ( self.category_name, "category", self.category_nicename, self.category_name )
-     	return item
+        item = """
+                <category><![CDATA[%s]]></category>
+                <category domain="%s" nicename="%s"><![CDATA[%s]]></category>
+                """ % ( self.category_name, "category", self.category_nicename, self.category_name )
+        return item
 
 def custom(database): #ONLY USED FOR CUSTOM DATABASES
     PostList = []
@@ -259,18 +260,18 @@ def custom(database): #ONLY USED FOR CUSTOM DATABASES
         print "Format your content as CSV with the following headers: "
         print "id,title,introtext,fulltext,sectionid,catid,created,created_by,created_by_alias"
 
-       	if trans_filename:
-       		#build a dict to translate id's to category names
-       		trans_reader = csv.reader(open(trans_filename), delimiter=',', quotechar='"')
-       		headerl = trans_reader.next()
-       		trans = {}
-       		trans[headerl[0]] = {}
-       		trans[headerl[1]] = {}
-       		for line in trans_reader:
-       			if line[0]:
-       				trans[headerl[0]][line[0]] = line[2]
-       			if line[1]:
-       				trans[headerl[1]][line[1]] = line[2]
+        if trans_filename:
+            #build a dict to translate id's to category names
+            trans_reader = csv.reader(open(trans_filename), delimiter=',', quotechar='"')
+            headerl = trans_reader.next()
+            trans = {}
+            trans[headerl[0]] = {}
+            trans[headerl[1]] = {}
+            for line in trans_reader:
+                if line[0]:
+                    trans[headerl[0]][line[0]] = line[2]
+                if line[1]:
+                    trans[headerl[1]][line[1]] = line[2]
 
         story_id = 0
         story_date = 6
@@ -392,38 +393,38 @@ def custom(database): #ONLY USED FOR CUSTOM DATABASES
 
 
         if trans_filename:
-        	cat_ids = category.split(",")
-        	try:
-        		c = Category(trans[headerl[0]][cat_ids[0]])
-        		CategoryList = addCat(CategoryList,c.get_name())
-        	except KeyError:
-        		print "No Section"
-        	try:
-        		cc = Category(trans[headerl[1]][cat_ids[1]])
-        		CategoryList = addCat(CategoryList,cc.get_name())
-        	except KeyError:
-        		print "No Category"
-        	categories = [c,cc]
+            cat_ids = category.split(",")
+            try:
+                c = Category(trans[headerl[0]][cat_ids[0]])
+                CategoryList = addCat(CategoryList,c.get_name())
+            except KeyError:
+                print "No Section"
+            try:
+                cc = Category(trans[headerl[1]][cat_ids[1]])
+                CategoryList = addCat(CategoryList,cc.get_name())
+            except KeyError:
+                print "No Category"
+            categories = [c,cc]
         else:
-        	categories = [Category(category)]
+            categories = [Category(category)]
         newPost = Post(post_id,categories,user,post_date,post_content,post_title,post_excerpt,id_num)
         PostList.append(newPost)
     print str(len(PostList))+" posts added."
     return CategoryList,PostList
 
 def addCat(CategoryList,category):
-	#horribly inefficient
-	unique_category = True
-	for existing_category in CategoryList:
-		if category == existing_category.get_name():
-			unique_category = False
+    #horribly inefficient
+    unique_category = True
+    for existing_category in CategoryList:
+        if category == existing_category.get_name():
+            unique_category = False
 
-	if unique_category:
-		print "Adding a new category."
-		print "     category name: " + category
-		newCategory = Category(category)
-		CategoryList.append(newCategory)
-	return CategoryList
+    if unique_category:
+        print "Adding a new category."
+        print "     category name: " + category
+        newCategory = Category(category)
+        CategoryList.append(newCategory)
+    return CategoryList
 
 def createStructures(CategoryList,PostList,stories,verbose,start_date):
     if verbose:
@@ -466,7 +467,7 @@ def createStructures(CategoryList,PostList,stories,verbose,start_date):
                   print "Adding a new category."
                   print "     category name: " + category
               CategoryList.append(newCategory)
-					
+                    
         newPost = Post(post_id,all_categories,user,post_date,post_content,post_title,post_excerpt,identification_num)
 
         #if (newPost.pubDate >= start_date):
@@ -573,11 +574,11 @@ def writeFiles(SiteInfo,PostList,CategoryList,author):
 
 <!-- generator="WordPress/2.7.1" -->
 <rss version="2.0"
-	xmlns:excerpt="http://wordpress.org/export/1.0/excerpt/"
-	xmlns:content="http://purl.org/rss/1.0/modules/content/"
-	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
-	xmlns:dc="http://purl.org/dc/elements/1.1/"
-	xmlns:wp="http://wordpress.org/export/1.0/"
+    xmlns:excerpt="http://wordpress.org/export/1.0/excerpt/"
+    xmlns:content="http://purl.org/rss/1.0/modules/content/"
+    xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+    xmlns:dc="http://purl.org/dc/elements/1.1/"
+    xmlns:wp="http://wordpress.org/export/1.0/"
 >
 
 <channel>
@@ -628,7 +629,7 @@ def importStories(verbose=False):
     "Issue_Date"        line[2]     story[1]    Sets the post date and time
     "Section_Name"      line[3]     story[2]    Sets the category name
     "Headline"          line[4]     story[3]    Sets the headline
-    "SubHeadline"       line[5]     story[7]	Sets the subheadline            
+    "SubHeadline"       line[5]     story[7]    Sets the subheadline            
     "Summary"           line[6]     story[4]    Sets the post excerpt
     "Story_Text"        line[7]     story[5]    Sets post content
     "Author"            line[8]     story[6]    Sets a user display name
@@ -638,7 +639,7 @@ def importStories(verbose=False):
     Content ID          line[0]     story[0]   
     Creation Date       line[1]     story[1]    Sets the post date - no post date
     Title               line[2]     story[3]    
-    Subtitle            line[3]		story[7]	Sets the subheadline
+    Subtitle            line[3]     story[7]    Sets the subheadline
     Byline              line[4]     story[6]    Sets a user display name
     Second Byline       line[5]
     Image Content ID    line[6]
@@ -791,10 +792,42 @@ def convertRaw(answer):
     else:
         return False
 
+def configureSettings():
+    config = ConfigParser.RawConfigParser()
+    # Try to read any values from the config file
+    settings = {}
+    settings['config_file'] = raw_input("Please enter config filename (optional): ")
+    if settings['config_file']:
+        while settings['config_file']:
+            try:
+                config.readfp(open(settings['config_file']))
+                break
+            except:
+                settings['config_file'] = raw_input("Invalid. Please enter config filename (optional): ")
+    else:
+         print "Hello!"   
+    return settings
+
 def main():
     print "Welcome to the College Publisher database converter, from CoPress Inc. ( http://copress.org )"
-    want_custom = raw_input("If you want to convert a custom database, please type the database name, lower-case. >> ")
-    if want_custom:
+    settings = configureSettings()
+    sys.exit()
+    if config_file:
+        try:
+            config.read(config_file)
+        except:
+            print ""
+        
+    try:
+        config.get('basic', 'archives_format')
+        archives_format = config.get('basic', 'archives_format')
+        print "Format of archives to be converted: " + archives_format
+    except:
+        archives_format = raw_input("Please enter your archives format: ")
+
+    sys.exit()
+    if archives_format != 'cp4' and archives_format != 'cp5':
+        
         CategoryList,PostList = custom(want_custom)
         default_link = raw_input("What is your root URL? ")
         author = True
@@ -846,7 +879,7 @@ def main():
 <wp:wxr_version>1.0</wp:wxr_version>
 <wp:base_site_url>%s</wp:base_site_url>
 <wp:base_blog_url>%s</wp:base_blog_url>
-            	""" % (default_link,time.strftime("%Y-%m-%d %I:%M%p",time.localtime()),default_link,default_link)
+                """ % (default_link,time.strftime("%Y-%m-%d %I:%M%p",time.localtime()),default_link,default_link)
 
     writeFiles(SiteInfo,PostList,CategoryList,author)
 
