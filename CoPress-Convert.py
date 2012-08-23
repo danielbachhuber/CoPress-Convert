@@ -263,7 +263,7 @@ def custom(database): #ONLY USED FOR CUSTOM DATABASES
 
         if trans_filename:
             #build a dict to translate id's to category names
-            trans_reader = csv.reader(open(trans_filename), delimiter=',', quotechar='"')
+            trans_reader = csv.reader(open(trans_filename, 'rU'), delimiter=',', quotechar='"')
             headerl = trans_reader.next()
             trans = {}
             trans[headerl[0]] = {}
@@ -322,7 +322,7 @@ def custom(database): #ONLY USED FOR CUSTOM DATABASES
     print " "
     print " "
 
-    storiesCSV = csv.reader(open('stories.csv'), delimiter=',', quotechar='"')
+    storiesCSV = csv.reader(open('stories.csv', 'rU'), delimiter=',', quotechar='"')
     stories = []
     i = 0
     for line in storiesCSV:
@@ -671,7 +671,7 @@ def importStories(settings):
         print "                CHECKING DATABASE TYPE                        "
         print " ############################################################ "
 
-    storiesCSV = csv.reader(open('stories.csv'), delimiter=',', quotechar='"')
+    storiesCSV = csv.reader(open('stories.csv', 'rU'), delimiter=',', quotechar='"')
     stories = []
     images  = []
     i = 0
